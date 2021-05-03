@@ -76,9 +76,6 @@ matching and the order in which the function is extended
 doesn't matter.
  *)
 
-(* open Generic_core *)
-(* open Generic_util *)
-
 exception Type_pattern_match_failure of string
 
 exception Type_pattern_overwrite of string
