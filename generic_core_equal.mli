@@ -14,7 +14,7 @@ type equal_fun =
 (** extends [equal] with a new case. *)
 val ext : 'a Ty.pat -> equal_fun -> unit
 
-val equal : 'a Ty .t -> 'b Ty.t -> ('a,'b) equal option
+val equal : 'a Ty.t -> 'b Ty.t -> ('a,'b) equal option
 
 (** Coerces a value between two intensionally equal types.
     In other words, [('a, 'b) equal] must be inhabited for a
