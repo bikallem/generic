@@ -54,7 +54,7 @@ module T : sig
   type (_,_) app = ..
 end
 
-type ('a,'b) t = ('a,'b) T.app
+type ('a,'b) t = ('a,'b) T.app = ..
 (** Synonym for convenience, when namespace [Generic_util] is
     opened, and one doesn't want to open [App.T], one can
     refer to [App.T.app] as [App.t].

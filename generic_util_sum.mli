@@ -9,7 +9,7 @@ type empty
 type ('a, 'b) sum = Left of 'a | Right of 'b
 
 (** Type witnesses for [empty] and [sum]. *)
-type _ Ty.t +=
+type _ Ty.t += 
     Empty : empty Ty.t
   | Sum : 'a Ty.t * 'b Ty.t -> ('a, 'b) sum Ty.t
 

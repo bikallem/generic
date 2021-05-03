@@ -54,7 +54,7 @@ The core generic library comes with the type reflection and introspection for al
 end
 
 include T
-type 'a t = 'a ty
+type 'a t = 'a ty = ..
 
 (* ** Forgetting the index
 The GADT syntax allows us to forget the type index using existential quantification.

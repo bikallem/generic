@@ -54,7 +54,7 @@ module T : sig
     | Fun : 'a ty * 'b ty -> ('a -> 'b) ty
 end
 (** Synonym for convenience. *)
-type 'a t = 'a T.ty
+type 'a t = 'a T.ty = ..
 type 'a ty = 'a T.ty = ..
 
 (** Re-export of T.ty constructors *)

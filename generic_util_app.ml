@@ -7,7 +7,7 @@ module T = struct
 end
 
 include T
-type ('a,'b) t = ('a,'b) app
+type ('a,'b) t = ('a,'b) app = ..
 
 (** {2 Core parametric  types} *)
 
