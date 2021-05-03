@@ -119,24 +119,23 @@ It generalises of the following cases:
 *)
 let conpat : 'a ty -> 'a ty =
   fun value ->
-  let open Obj in
-  let rv = repr value in
-  tag rv |>
+  let rv = Obj.repr value in
+  Obj.tag rv |>
     function
-    | t when t == object_tag
+    | t when t == Obj.object_tag
       (* [value] is a constructor of arity 0 *)
       -> value
     | t when t == 0
       (* [value] has a constructor [field rv 0] of arity [size rv - 1] *)
-      -> let any = repr Any
-         and n = size rv in
-         let con = new_block t n in
+      -> let any = Obj.repr Any
+         and n = Obj.size rv in
+         let con = Obj.new_block t n in
          begin
-           set_field con 0 (field rv 0);
+           Obj.set_field con 0 (Obj.field rv 0);
            for i = 1 to n - 1 do
-             set_field con i any
+             Obj.set_field con i any
            done;
-           obj con
+           Obj.obj con
          end
     | _ -> assert false
 ;;
