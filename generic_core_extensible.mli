@@ -49,8 +49,6 @@ a type pattern that was already registered.
 (* type 'a ty = 'a Generic_core_ty.ty = .. *)
 (* type 'a pat = 'a Generic_core_ty.pat *)
 (* type ('a, 'b) app = ('a, 'b) Generic_util_app.app = .. *)
-open Generic_core
-open Generic_util
 
 exception Type_pattern_match_failure of string
 (** Raised by the [f] field of a {!closure} when there is no
@@ -64,19 +62,19 @@ exception Type_pattern_overwrite of string
 (** Type-indexed function, ['b] is the code for a parametric type ['a f]
 such that ['b ty_fun] is equivalent to [for all 'a . 'a f]
 *)
-type 'b ty_fun = { f : 'a. 'a Ty.ty -> ('a, 'b) App.t; }
+type 'b ty_fun = { f : 'a. 'a Generic_core.Ty.ty -> ('a, 'b) Generic_util.App.t; }
 
 
 (** A closure allows us to call a type-indexed function and
     to extend it to new type cases.
 *)
 type 'b closure = {
-    f : 'a. 'a Ty.ty -> ('a, 'b) App.t;
+    f : 'a. 'a Generic_core.Ty.ty -> ('a, 'b) Generic_util.App.t;
     (** [f]: applies the extensible function.
        @raise Type_pattern_match_failure when the type index doesn't
        match any of the patterns in the collection.  *)
 
-    ext : 'a. 'a Ty.pat -> 'b ty_fun -> unit;
+    ext : 'a. 'a Generic_core.Ty.pat -> 'b ty_fun -> unit;
     (** [ext]: extends the function with a new case. We must
         provide a type pattern, (example: [List Any]). The
         [ty_fun] provided is only expected to handle types

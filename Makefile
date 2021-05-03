@@ -152,7 +152,8 @@ LIB_GENERIC=generic.cma generic.cmxa libgeneric.a generic.a
 all: ppx lib tests doc
 doc: $(DOC)/index.html import # doc/dep.dot
 ppx: reify import
-lib: ppx $(LIB_GENERIC)
+lib: $(LIB_GENERIC) # remove ppx since it is broken
+# lib: ppx $(LIB_GENERIC)
 tests: ppx test_marshal test_show test_multiplate
 
 # TODO: fix the weird circular dependency

@@ -76,31 +76,31 @@ matching and the order in which the function is extended
 doesn't matter.
  *)
 
-open Generic_core
-open Generic_util
+(* open Generic_core *)
+(* open Generic_util *)
 
 exception Type_pattern_match_failure of string
+
 exception Type_pattern_overwrite of string
 
-type 'b ty_fun = { f : 'a. 'a Ty.ty -> ('a, 'b) App.t; }
+type 'b ty_fun = {
+  f : 'a. 'a Generic_core.Ty.ty -> ('a, 'b) Generic_util.App.t;
+}
+
 type 'b closure = {
+  (* f: applies the extensible function, raises
+     Type_pattern_match_failure when the type index doesn't
+     match any of the patterns in the collection. *)
+  f : 'a. 'a Generic_core.Ty.ty -> ('a, 'b) Generic_util.App.t;
+  (* ext: extends the function with a new case, raises
+     Pattern_overwrite when called with a type pattern that
+     was already registered.
+  *)
+  ext : 'a. 'a Generic_core.Ty.pat -> 'b ty_fun -> unit; (* Effectful *)
+}
 
-    (* f: applies the extensible function, raises
-       Type_pattern_match_failure when the type index doesn't
-       match any of the patterns in the collection.  *)
-
-    f : 'a. 'a Ty.ty -> ('a, 'b) App.t;
-
-    (* ext: extends the function with a new case, raises
-      Pattern_overwrite when called with a type pattern that
-      was already registered.
-     *)
-
-    ext : 'a. 'a Ty.pat -> 'b ty_fun -> unit; (* Effectful *)
-  }
-
-
-type 'f ty_table = (Ty.ty', (Ty.ty' * 'f ty_fun) list) Hashtbl.t
+type 'f ty_table =
+  (Generic_core.Ty.ty', (Generic_core.Ty.ty' * 'f ty_fun) list) Hashtbl.t
 
 (* "apply_fun name table type"
        tries to get the table "entry" corresponding to "type"
@@ -111,32 +111,36 @@ type 'f ty_table = (Ty.ty', (Ty.ty' * 'f ty_fun) list) Hashtbl.t
 
 let apply_fun name h t =
   let apply_list fs =
-    Listx.match_list (fun (_,(f : 'f ty_fun)) -> f.f t) fs
+    Generic_util.Listx.match_list (fun (_, (f : 'f ty_fun)) -> f.f t) fs
   in
   let default () =
-    try Hashtbl.find h (Ty.E Ty.Any)
-    with Not_found ->
-      raise (Type_pattern_match_failure name)
+    try Hashtbl.find h (Generic_core.Ty.E Generic_core.Ty.Any)
+    with Not_found -> raise (Type_pattern_match_failure name)
   in
-  try apply_list (Hashtbl.find h (Ty.E (Ty.conpat t)))
-  with Not_found | Listx.Match_list_failure
-                   -> try apply_list (default ())
-                      with Listx.Match_list_failure
-                           -> raise (Type_pattern_match_failure name)
+  try apply_list (Hashtbl.find h (Generic_core.Ty.E (Generic_core.Ty.conpat t)))
+  with Not_found | Generic_util.Listx.Match_list_failure -> (
+    try apply_list (default ())
+    with Generic_util.Listx.Match_list_failure ->
+      raise (Type_pattern_match_failure name))
 
 let insert_fun name table t f =
   (*  preorder *)
-  let fun_leq (Ty.E t, f) (Ty.E t', f') = Patterns.leq t t'
+  let fun_leq (Generic_core.Ty.E t, f) (Generic_core.Ty.E t', f') =
+    Generic_core.Patterns.leq t t'
   in
   let insert xs x =
-    try Listx.sl_insert fun_leq xs x
-    with Listx.Insert_duplicate ->
+    try Generic_util.Listx.sl_insert fun_leq xs x
+    with Generic_util.Listx.Insert_duplicate ->
       raise (Type_pattern_overwrite name)
   in
-  Hash.update table (Ty.E (Ty.conpat t)) (insert (E t, f)) []
+  Generic_util.Hash.update table
+    (Generic_core.Ty.E (Generic_core.Ty.conpat t))
+    (insert (E t, f))
+    []
 
 let create name =
-  let table = Hashtbl.create 10
-  in { f   = (fun t -> apply_fun name table t)
-     ; ext = (fun t f -> insert_fun name table t f)
-     }
+  let table = Hashtbl.create 10 in
+  {
+    f = (fun t -> apply_fun name table t);
+    ext = (fun t f -> insert_fun name table t f);
+  }
