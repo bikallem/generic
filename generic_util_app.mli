@@ -43,8 +43,6 @@
     {!module:Generic_core_extensible}.
 *)
 
-open Generic_util
-
 (** {2 Type Application}
  *)
 

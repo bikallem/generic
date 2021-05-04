@@ -1,6 +1,4 @@
 (* Dealing with parametric types using defunctionalisation. *)
-open Generic_util
-open Monoid
 
 module T = struct
   type ('a,'b) app = ..
